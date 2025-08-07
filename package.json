@@ -14,7 +14,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "build": "tsc",
@@ -62,6 +62,10 @@
     }
   },
   "dependencies": {
+    "chalk": "5.5.0",
+    "commander": "14.0.0",
+    "inquirer": "12.9.0",
+    "ora": "8.2.0",
     "your-package-name": "link:"
   }
 }

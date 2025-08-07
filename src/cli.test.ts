@@ -10,41 +10,69 @@ vi.mock('node:fs', async (importOriginal) => {
   };
 });
 
-describe('cli', () => {
-  beforeEach(() => {});
+describe('CLI', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should work and return the correct message when a package name is explicitly provided', () => {
-    const testPackageName = 'my-explicit-package';
+  it('should return success result when package name is explicitly provided', () => {
+    const testPackageName = 'my-awesome-cli';
     const result = runCli(testPackageName);
 
     expect(vi.mocked(readFileSync)).not.toHaveBeenCalled();
-    expect(result).toBe(`${testPackageName} CLI is working!`);
+    expect(result.success).toBe(true);
+    expect(result.packageName).toBe(testPackageName);
+    expect(result.message).toBe(
+      `Welcome to ${testPackageName}! The CLI is ready to use.`,
+    );
   });
 
-  it('should work and return the correct message when the package name is derived dynamically', () => {
-    const dynamicPackageName = 'mocked-dynamic-package';
+  it('should return success result when package name is read from package.json', () => {
+    const dynamicPackageName = 'my-dynamic-package';
     vi.mocked(readFileSync).mockReturnValueOnce(
-      JSON.stringify({ name: dynamicPackageName }),
+      JSON.stringify({ name: dynamicPackageName, version: '1.0.0' }),
     );
 
     const result = runCli();
 
     expect(vi.mocked(readFileSync)).toHaveBeenCalledTimes(1);
-    expect(result).toBe(`${dynamicPackageName} CLI is working!`);
+    expect(result.success).toBe(true);
+    expect(result.packageName).toBe(dynamicPackageName);
+    expect(result.message).toBe(
+      `Welcome to ${dynamicPackageName}! The CLI is ready to use.`,
+    );
   });
 
-  it('should handle errors gracefully when reading package.json dynamically', () => {
+  it('should handle package.json read errors gracefully', () => {
     vi.mocked(readFileSync).mockImplementationOnce(() => {
-      throw new Error('Simulated file read error');
+      throw new Error('File not found');
     });
 
     const result = runCli();
 
     expect(vi.mocked(readFileSync)).toHaveBeenCalledTimes(1);
-    expect(result).toBe('unknown-package CLI is working!');
+    expect(result.success).toBe(true);
+    expect(result.packageName).toBe('unknown-package');
+    expect(result.message).toBe(
+      'Welcome to unknown-package! The CLI is ready to use.',
+    );
+  });
+
+  it('should handle package.json without name field', () => {
+    vi.mocked(readFileSync).mockReturnValueOnce(
+      JSON.stringify({ version: '1.0.0' }),
+    );
+
+    const result = runCli();
+
+    expect(result.success).toBe(true);
+    expect(result.packageName).toBe('unknown-package');
+    expect(result.message).toBe(
+      'Welcome to unknown-package! The CLI is ready to use.',
+    );
   });
 });

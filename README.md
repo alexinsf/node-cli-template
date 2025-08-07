@@ -46,7 +46,7 @@ To use this template for your new project:
    This will also set up the Husky Git hooks automatically.
 
 4. **Customize `package.json`:**
-   - Update `name`, `description`, `author`, and `bin` (if it's a CLI) fields.
+   - Update `name`, `description`, `author`, and `bin` fields.
    - Change `"your-package-name"` and `"your-cli-command"` placeholders.
 
 5. **Update `src/cli.ts`:**
